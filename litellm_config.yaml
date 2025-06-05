@@ -1,0 +1,13 @@
+model_list:
+  - model_name: claude-sonnet-4
+    litellm_params:
+      model: claude-code-server/claude-code
+
+general_settings:
+  master_key: sk-1234  # Change this in production
+  
+litellm_settings:
+  drop_params: true
+  custom_provider_map:
+    - provider: "claude-code-server"
+      custom_handler: "claude_code_server.provider.claude_code_provider_instance"

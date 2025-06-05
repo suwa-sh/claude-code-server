@@ -19,7 +19,6 @@ wheels/
 *.egg-info/
 .installed.cfg
 *.egg
-MANIFEST
 
 # Virtual Environment
 venv/
@@ -27,8 +26,9 @@ ENV/
 env/
 .venv
 
-# Rye
-.rye/
+# Git
+.git/
+.gitignore
 
 # IDE
 .vscode/
@@ -37,10 +37,7 @@ env/
 *.swo
 *~
 
-# Temporary files for Docker build
-requirements.txt
-
-# Environment variables
+# Environment
 .env
 .env.local
 
@@ -56,10 +53,28 @@ requirements.txt
 .DS_Store
 Thumbs.db
 
+# Testing and coverage
 .pytest_cache/
-htmlcov/
 .coverage
-.coverage.*
 coverage.xml
+htmlcov/
+.tox/
+.cache
+nosetests.xml
+*.cover
 
+# Development files
+requirements-dev.lock
+tests/
+test_*.py
 tmp/
+run_local.sh
+start_litellm.py
+custom_litellm.py
+
+# CI/CD
+.github/
+
+# Documentation
+README.md
+CLAUDE.md

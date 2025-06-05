@@ -1,0 +1,107 @@
+[project]
+name = "claude-code-server"
+version = "0.1.0"
+description = "OpenAI API compatible server for claude-code CLI"
+authors = [
+    { name = "suwa-sh", email = "suwa-sh@users.noreply.github.com" }
+]
+dependencies = [
+    "pydantic>=2.10.5",
+    "python-dotenv>=1.0.1",
+    "httpx>=0.23.0,<0.28.0",
+    "litellm[proxy]>=1.72.1",
+]
+requires-python = ">= 3.10"
+license = { file = "LICENSE" }
+keywords = ["claude", "litellm", "openai", "api", "proxy"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[project.urls]
+homepage = "https://github.com/suwa-sh/claude-code-server"
+repository = "https://github.com/suwa-sh/claude-code-server"
+issues = "https://github.com/suwa-sh/claude-code-server/issues"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.rye]
+managed = true
+dev-dependencies = [
+    "pytest>=8.3.4",
+    "pytest-asyncio>=0.25.0",
+    "pytest-mock>=3.14.0",
+    "pytest-cov>=6.0.0",
+    "openai>=1.58.1",
+    "black>=24.10.0",
+    "isort>=5.13.2",
+    "flake8>=7.1.1",
+    "mypy>=1.13.0",
+]
+
+[tool.hatch.metadata]
+allow-direct-references = true
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/claude_code_server"]
+
+[tool.black]
+line-length = 100
+target-version = ["py310", "py311", "py312"]
+
+[tool.isort]
+profile = "black"
+line_length = 100
+
+[tool.mypy]
+python_version = "3.10"
+warn_return_any = false
+warn_unused_configs = true
+disallow_untyped_defs = false
+ignore_errors = true
+exclude = ["tests/"]
+
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = [
+    "-v",
+    "--tb=short",
+    "--strict-markers",
+    "--cov=claude_code_server",
+    "--cov-report=term-missing",
+    "--cov-report=html",
+    "--cov-report=xml",
+]
+markers = [
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+]
+filterwarnings = [
+    "ignore::pydantic.warnings.PydanticDeprecatedSince20",
+]
+asyncio_mode = "auto"
+
+[tool.coverage.run]
+source = ["claude_code_server"]
+omit = ["*/tests/*", "*/__init__.py"]
+
+[tool.coverage.report]
+exclude_lines = [
+    "pragma: no cover",
+    "def __repr__",
+    "raise AssertionError",
+    "raise NotImplementedError",
+    "if __name__ == .__main__.:",
+]

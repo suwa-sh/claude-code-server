@@ -1,0 +1,26 @@
+services:
+  claude-code-server:
+    image: claude-code-server:latest
+    container_name: claude-code-server
+    restart: unless-stopped
+    ports:
+      - "4000:4000"
+    environment:
+      - PORT=4000
+      - LITELLM_MASTER_KEY=${LITELLM_MASTER_KEY:-sk-1234}
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY}
+    volumes:
+      # Optional: Mount custom config file
+      - ./litellm_config.yaml:/app/litellm_config.yaml:ro
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:4000"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+    networks:
+      - claude-network
+
+networks:
+  claude-network:
+    driver: bridge
