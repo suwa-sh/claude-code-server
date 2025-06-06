@@ -1,4 +1,4 @@
-.PHONY: help init sync install test test-unit test-integration test-all coverage lint format run run-server run-local docker-build docker-run clean
+.PHONY: help init sync install test test-unit test-integration test-all coverage lint lint-check format ci-lint run run-server run-local docker-build docker-run clean
 
 help:
 	@echo "Available commands:"
@@ -10,8 +10,10 @@ help:
 	@echo "  make test-integration   - Run integration tests (requires longer time)"
 	@echo "  make test-all           - Run all tests (provider + integration)"
 	@echo "  make coverage           - Run tests with coverage report"
-	@echo "  make lint               - Run linting"
-	@echo "  make format             - Format code"
+	@echo "  make lint               - Run linting (flake8 + mypy)"
+	@echo "  make lint-check         - Check code formatting (black + isort)"
+	@echo "  make format             - Format code (black + isort)"
+	@echo "  make ci-lint            - Run all linting checks (for CI)"
 	@echo "  make run                - Run the LiteLLM proxy server"
 	@echo "  make run-server         - Run the LiteLLM proxy server (alias for run)"
 	@echo "  make run-local          - Run the server using run_local.sh script"
@@ -32,12 +34,18 @@ sync:
 
 
 lint:
-	rye run flake8 claude_code_server tests
+	rye run flake8 claude_code_server
 	rye run mypy claude_code_server
+
+lint-check:
+	rye run black --check claude_code_server
+	rye run isort --check-only claude_code_server
 
 format:
 	rye run black claude_code_server tests
 	rye run isort claude_code_server tests
+
+ci-lint: lint lint-check
 
 test:
 	rye run pytest tests/test_provider.py -v

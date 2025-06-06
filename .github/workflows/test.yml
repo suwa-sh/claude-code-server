@@ -20,17 +20,10 @@ jobs:
         version: 'latest'
     
     - name: Sync dependencies
-      run: rye sync
+      run: make sync
     
-    - name: Run linting
-      run: |
-        rye run flake8 claude_code_server tests
-        rye run mypy claude_code_server
-    
-    - name: Check formatting
-      run: |
-        rye run black --check claude_code_server tests
-        rye run isort --check-only claude_code_server tests
+    - name: Run all linting checks
+      run: make ci-lint
 
   test:
     name: Unit Tests (Python ${{ matrix.python-version }})
@@ -50,11 +43,14 @@ jobs:
     - name: Set up Python ${{ matrix.python-version }}
       run: |
         rye pin ${{ matrix.python-version }}
-        rye sync
+        make sync
     
     - name: Run unit tests
-      run: |
-        rye run pytest tests/test_provider.py -v --cov-report=xml --cov-report=term
+      run: make test
+    
+    - name: Generate coverage report
+      if: matrix.python-version == '3.11'
+      run: make coverage
     
     - name: Upload coverage to Codecov
       if: matrix.python-version == '3.11'
@@ -77,7 +73,7 @@ jobs:
         version: 'latest'
     
     - name: Sync dependencies
-      run: rye sync
+      run: make sync
     
     - name: Install Node.js (for claude-code CLI)
       uses: actions/setup-node@v4
@@ -106,6 +102,5 @@ jobs:
         claude -p "test"
     
     - name: Run integration tests
-      run: |
-        rye run pytest tests/test_integration.py -v
+      run: make test-integration
       timeout-minutes: 10

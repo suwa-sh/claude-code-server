@@ -69,16 +69,14 @@ class ClaudeCodeProvider(CustomLLM):
         loop = asyncio.get_event_loop()
         return await loop.run_in_executor(None, completion_wrapper)
 
-    async def astreaming(
-        self, model: str, messages: List[Dict[str, Any]], **kwargs
-    ):
+    async def astreaming(self, model: str, messages: List[Dict[str, Any]], **kwargs):
         """Handle async streaming requests"""
         # Get the response asynchronously
         response = await self.acompletion(model, messages, **kwargs)
 
         # Create streaming chunks - split content into words for demonstration
         content = response.choices[0].message.content
-        
+
         # Since claude-code doesn't support streaming, return the full response as one chunk
         # Return raw dict format that LiteLLM expects
         chunk = {
@@ -89,7 +87,7 @@ class ClaudeCodeProvider(CustomLLM):
                 "prompt_tokens": response.usage.get("prompt_tokens", 0),
                 "completion_tokens": response.usage.get("completion_tokens", 0),
                 "total_tokens": response.usage.get("total_tokens", 0),
-            }
+            },
         }
         yield chunk
 
@@ -97,12 +95,12 @@ class ClaudeCodeProvider(CustomLLM):
         """Execute claude-code CLI command"""
         # Try to find claude-code command
         import shutil
-        
+
         claude_cmd = shutil.which("claude")
-        
+
         if not claude_cmd:
             raise RuntimeError("claude command not found. Please install claude-code CLI.")
-        
+
         cmd = [claude_cmd, "-p", prompt]
         logger.info(f"Executing command: {' '.join(cmd)}")
 
@@ -114,14 +112,14 @@ class ClaudeCodeProvider(CustomLLM):
         except subprocess.CalledProcessError as e:
             error_msg = e.stderr if e.stderr else e.stdout if e.stdout else "Unknown error"
             logger.error(f"claude-code failed: {error_msg}")
-            
+
             # Check for common authentication issues
             if "Invalid API key" in error_msg or "Please run /login" in error_msg:
                 raise RuntimeError(
                     "claude-code authentication failed. Please set ANTHROPIC_API_KEY environment variable "
                     "or run 'claude /login' to authenticate."
                 )
-            
+
             raise RuntimeError(f"claude-code failed: {error_msg}")
 
 
