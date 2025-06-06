@@ -57,7 +57,7 @@ test-all:
 	rye run pytest -v
 
 coverage:
-	rye run pytest --cov=claude_code_server --cov-report=html --cov-report=term
+	rye run pytest tests/test_provider.py --cov=claude_code_server --cov-report=html --cov-report=term --cov-report=xml
 
 run:
 	LITELLM_LOG=debug rye run litellm --config litellm_config.yaml
