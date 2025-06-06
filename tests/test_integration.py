@@ -27,8 +27,19 @@ class TestIntegration:
             stderr=subprocess.PIPE,
         )
 
-        # Wait for server to start
-        time.sleep(5)
+        # Wait for server to be ready by checking health endpoint
+        max_retries = 30  # 30 seconds
+        for i in range(max_retries):
+            try:
+                response = httpx.get("http://localhost:4001", timeout=1.0)
+                if response.status_code == 200:
+                    break
+            except Exception:
+                pass
+            time.sleep(1)
+        else:
+            process.terminate()
+            raise RuntimeError("Server failed to start within 30 seconds")
 
         yield process
 
@@ -163,7 +174,7 @@ class TestIntegration:
         # 実行 & 検証
         #------------------------------
         with pytest.raises(Exception):  # Should raise authentication error
-            stream = client.chat.completions.create(
+            client.chat.completions.create(
                 model=model,
                 messages=[message],
                 stream=True
